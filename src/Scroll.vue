@@ -42,13 +42,26 @@ export default {
     },
   },
   methods: {
-    moveBar() {
+    chanegeScroll(direction, newScroll) {
+      const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
 
+      const minScroll = 0;
+      const maxScroll = direction === 'x' ? maxScrollWidth : maxScrollHeight;
+
+      const currentScroll = this.scroll[direction];
+
+      if (currentScroll + newScroll <= minScroll) {
+        this.scroll[direction] = minScroll;
+      } else if (currentScroll + newScroll >= maxScroll) {
+        this.scroll[direction] = maxScroll;
+      } else {
+        this.scroll[direction] += newScroll;
+      }
     },
     handleScroll(e) {
       const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
 
-      this.moveBar(delta);
+      this.chanegeScroll('horizontal', delta);
     },
     getComponentDOMInfo() {
       const {
