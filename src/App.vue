@@ -1,6 +1,13 @@
 <template>
   <div id="app">
-    <scroll />
+
+    <div class="example">
+      <scroll>
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eum, praesentium modi. Eius accusantium vero ullam cum aut temporibus ipsum nostrum ipsam. Aut nemo quisquam molestiae dolore laborum, aliquam veritatis ex!
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Eum, praesentium modi. Eius accusantium vero ullam cum aut temporibus ipsum nostrum ipsam. Aut nemo quisquam molestiae dolore laborum, aliquam veritatis ex!
+      </scroll>
+    </div>
+
   </div>
 </template>
 

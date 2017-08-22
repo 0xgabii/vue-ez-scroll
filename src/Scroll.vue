@@ -1,26 +1,16 @@
 <template>
   <div class="vScroll" :id="scrollId">
 
+    <div class="vScroll__content">
+      <slot />
+    </div>
+
   </div>
 </template>
 
 <script>
 export default {
   name: 'Scroll',
-  props: {
-    horizontal: {
-      type: Boolean,
-      default: true,
-    },
-    vertical: {
-      type: Boolean,
-      default: true,
-    },
-    scrollAtOnce: {
-      type: Number,
-      default: 100,
-    },
-  },
   data: () => ({
     id: 0,
   }),
