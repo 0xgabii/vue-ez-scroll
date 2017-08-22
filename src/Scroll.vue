@@ -21,15 +21,37 @@ export default {
   name: 'Scroll',
   data: () => ({
     id: 0,
+
+    scroll: {
+      vertical: 0,
+      horizontal: 0,
+    },
   }),
   computed: {
     scrollId() {
       return `scroll-${this.id}`;
     },
   },
+  methods: {
+    moveBar() {
+
+    },
+    handleScroll(e) {
+      const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+
+      this.moveBar(delta);
+    },
+  },
   mounted() {
     // eslint-disable-next-line
     this.id = this._uid;
+
+    this.$nextTick(() => {
+      const component = document.getElementById(this.scrollId);
+
+      component.addEventListener('mousewheel', this.handleScroll);
+      component.addEventListener('DOMMouseScroll', this.handleScroll);
+    });
   },
 };
 </script>
