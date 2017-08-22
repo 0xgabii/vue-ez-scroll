@@ -1,3 +1,44 @@
 .vScroll {
   position: relative;
+  overflow: hidden;
+
+  &__rail {
+    position: absolute;
+
+    &--vertical {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      
+      width: 10px;
+    }
+
+    &--horizontal {
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      height: 10px;
+    }
+  }
+
+  &__bar {
+    position: absolute;
+
+    background-color: black; 
+
+    &--vertical {
+      top: 0;
+      right: 0;
+      
+      width: 10px;
+    }
+
+    &--horizontal {
+      left: 0;
+      bottom: 0;
+
+      width: 10px;
+    }
+  }
 }

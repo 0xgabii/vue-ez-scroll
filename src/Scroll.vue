@@ -5,6 +5,14 @@
       <slot />
     </div>
 
+    <div class="vScroll__rail vScroll__rail--horizontal">
+      <div class="vScroll__bar vScroll__bar--horizontal" />
+    </div>
+  
+    <div class="vScroll__rail vScroll__rail--vertical">
+      <div class="vScroll__bar vScroll__bar--vertical" />
+    </div>
+
   </div>
 </template>
 
