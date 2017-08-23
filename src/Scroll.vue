@@ -74,8 +74,9 @@ export default {
         clientHeight,
         scrollWidth,
         scrollHeight,
+        maxScrollWidth,
+        maxScrollHeight,
       } = this.scrollEnv;
-
       /*
         Exact size of the scrollbar
         visible part * (visible part / scroll part)
@@ -93,14 +94,22 @@ export default {
         v: (clientHeight - barSize.v) * (vScrollPercent / 100),
       };
 
+      // Shows only if there is space available for scrolling
+      const barDisplay = {
+        h: maxScrollWidth === 0 ? 0 : 1,
+        v: maxScrollHeight === 0 ? 0 : 1,
+      };
+
       return {
         horizontal: {
           width: `${barSize.h}px`,
           left: `${barPosition.h}px`,
+          opacity: barDisplay.h,
         },
         vertical: {
           height: `${barSize.v}px`,
           top: `${barPosition.v}px`,
+          opacity: barDisplay.v,
         },
       };
     },
