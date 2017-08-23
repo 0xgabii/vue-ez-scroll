@@ -23,8 +23,24 @@
 </template>
 
 <script>
+const defaultOption = {
+  // scroll direction
+  horizontal: true,
+  vertical: true,
+  // size of the scrollbar = undefined ? variable : fixed
+  barSize: undefined,
+  // higher value => faster scrolling
+  wheelSpeed: 150,
+};
+
 export default {
   name: 'Scroll',
+  props: {
+    option: {
+      type: Object,
+      default: () => defaultOption,
+    },
+  },
   data: () => ({
     id: 0,
 
@@ -46,7 +62,12 @@ export default {
     scrollId() {
       return `scroll-${this.id}`;
     },
-
+    scrollOption() {
+      return {
+        ...this.option,
+        ...defaultOption,
+      };
+    },
     scrollPercent() {
       const { horizontal, vertical } = this.scroll;
       const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
@@ -79,11 +100,11 @@ export default {
       } = this.scrollEnv;
       /*
         Exact size of the scrollbar
-        visible part * (visible part / scroll part)
+        default barsize undefined => visible part * (visible part / scroll part)
       */
       const barSize = {
-        h: clientWidth * (clientWidth / scrollWidth),
-        v: clientHeight * (clientHeight / scrollHeight),
+        h: this.scrollOption.barSize || clientWidth * (clientWidth / scrollWidth),
+        v: this.scrollOption.barSize || clientHeight * (clientHeight / scrollHeight),
       };
       /*
         Exact position of the scrollbar
@@ -132,9 +153,16 @@ export default {
       }
     },
     handleScroll(e) {
-      const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail)));
+      const { vertical, horizontal, wheelSpeed } = this.scrollOption;
+      const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * wheelSpeed;
 
-      this.chanegeScroll('horizontal', delta);
+      if (vertical && horizontal) {
+        this.chanegeScroll('vertical', delta);
+      } else if (vertical && !horizontal) {
+        this.chanegeScroll('vertical', delta);
+      } else {
+        this.chanegeScroll('horizontal', delta);
+      }
     },
     getComponentDOMInfo() {
       const {
