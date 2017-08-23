@@ -1,16 +1,22 @@
 <template>
   <div class="vScroll" :id="scrollId">
 
-    <div class="vScroll__content">
+    <div class="vScroll__content" :style="contentStyle">
       <slot />
     </div>
 
     <div class="vScroll__rail vScroll__rail--horizontal">
-      <div class="vScroll__bar vScroll__bar--horizontal" />
+      <div 
+        class="vScroll__bar vScroll__bar--horizontal"
+        :style="scrollStyle.horizontal"
+      />
     </div>
   
     <div class="vScroll__rail vScroll__rail--vertical">
-      <div class="vScroll__bar vScroll__bar--vertical" />
+      <div 
+        class="vScroll__bar vScroll__bar--vertical"
+        :style="scrollStyle.vertical"
+      />
     </div>
 
   </div>
@@ -40,13 +46,71 @@ export default {
     scrollId() {
       return `scroll-${this.id}`;
     },
+
+    scrollPercent() {
+      const { horizontal, vertical } = this.scroll;
+      const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
+
+      return {
+        horizontal: (horizontal / maxScrollWidth) * 100,
+        vertical: (vertical / maxScrollHeight) * 100,
+      };
+    },
+
+    contentStyle() {
+      const { horizontal, vertical } = this.scroll;
+
+      return {
+        transform: `translate(${-horizontal}px, ${-vertical}px)`,
+      };
+    },
+    scrollStyle() {
+      const {
+        horizontal: hScrollPercent,
+        vertical: vScrollPercent,
+      } = this.scrollPercent;
+      const {
+        clientWidth,
+        clientHeight,
+        scrollWidth,
+        scrollHeight,
+      } = this.scrollEnv;
+
+      /*
+        Exact size of the scrollbar
+        visible part * (visible part / scroll part)
+      */
+      const barSize = {
+        h: clientWidth * (clientWidth / scrollWidth),
+        v: clientHeight * (clientHeight / scrollHeight),
+      };
+      /*
+        Exact position of the scrollbar
+        (visible part - scrollbar size) * (scrolling percentage / 100)
+      */
+      const barPosition = {
+        h: (clientWidth - barSize.h) * (hScrollPercent / 100),
+        v: (clientHeight - barSize.v) * (vScrollPercent / 100),
+      };
+
+      return {
+        horizontal: {
+          width: `${barSize.h}px`,
+          left: `${barPosition.h}px`,
+        },
+        vertical: {
+          height: `${barSize.v}px`,
+          top: `${barPosition.v}px`,
+        },
+      };
+    },
   },
   methods: {
     chanegeScroll(direction, newScroll) {
       const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
 
       const minScroll = 0;
-      const maxScroll = direction === 'x' ? maxScrollWidth : maxScrollHeight;
+      const maxScroll = direction === 'horizontal' ? maxScrollWidth : maxScrollHeight;
 
       const currentScroll = this.scroll[direction];
 

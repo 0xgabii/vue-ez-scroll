@@ -2,6 +2,10 @@
   position: relative;
   overflow: hidden;
 
+  &__content {
+    transition: all 0.2s;
+  }
+
   &__rail {
     position: absolute;
 
@@ -27,6 +31,8 @@
 
     background-color: black; 
 
+    transition: all 0.2s;
+
     &--vertical {
       top: 0;
       right: 0;
@@ -38,7 +44,7 @@
       left: 0;
       bottom: 0;
 
-      width: 10px;
+      height: 10px;
     }
   }
 }
