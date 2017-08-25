@@ -12,10 +12,12 @@
       />
     </div>
   
-    <div class="vScroll__rail vScroll__rail--vertical">
+    <div class="vScroll__rail vScroll__rail--vertical" @mousemove="dragging('vertical', $event)">
       <div 
         class="vScroll__bar vScroll__bar--vertical"
         :style="scrollStyle.vertical"
+        @mousedown="dragStart('vertical')"
+        @mouseup="dragEnd('vertical')"
       />
     </div>
 
@@ -47,6 +49,11 @@ export default {
     scroll: {
       vertical: 0,
       horizontal: 0,
+    },
+
+    drag: {
+      vertical: false,
+      horizontal: false,
     },
 
     scrollEnv: {
@@ -136,6 +143,18 @@ export default {
     },
   },
   methods: {
+    dragStart(direction) {
+      this.drag[direction] = true;
+    },
+    dragEnd(direction) {
+      this.drag[direction] = false;
+    },
+    dragging(direction, e) {
+      if (this.drag[direction]) {
+        console.log(e);
+        this.scroll[direction] = e.clientY;
+      }
+    },
     chanegeScroll(direction, newScroll) {
       const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
 
