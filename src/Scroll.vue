@@ -1,5 +1,9 @@
 <template>
-  <div class="vScroll" :id="scrollId">
+  <div 
+    class="vScroll" 
+    :id="scrollId">
+
+    {{d}} X {{dd}} X {{scrollEnv.clientHeight}}
 
     <div class="vScroll__content" :style="contentStyle">
       <slot />
@@ -11,13 +15,12 @@
         :style="scrollStyle.horizontal"
       />
     </div>
-  
-    <div class="vScroll__rail vScroll__rail--vertical" @mousemove="dragging('vertical', $event)">
+   
+    <div class="vScroll__rail vScroll__rail--vertical">
       <div 
         class="vScroll__bar vScroll__bar--vertical"
         :style="scrollStyle.vertical"
-        @mousedown="dragStart('vertical')"
-        @mouseup="dragEnd('vertical')"
+        @mousedown="dragStart('vertical', $event)"
       />
     </div>
 
@@ -50,6 +53,9 @@ export default {
       vertical: 0,
       horizontal: 0,
     },
+
+    d: 0,
+    dd: 0,
 
     drag: {
       vertical: false,
@@ -143,16 +149,43 @@ export default {
     },
   },
   methods: {
-    dragStart(direction) {
+    addDragEventListener() {
+      document.addEventListener('mouseup', this.dragEnd);
+      document.addEventListener('mousemove', this.dragging);
+    },
+    removeDragEventListener() {
+      document.removeEventListener('mouseup', this.dragEnd);
+      document.removeEventListener('mousemove', this.dragging);
+    },
+
+    dragStart(direction, e) {
       this.drag[direction] = true;
+
+      this.d = e.pageY;
+
+      this.addDragEventListener();
     },
-    dragEnd(direction) {
-      this.drag[direction] = false;
+    dragEnd() {
+      const { vertical, horizontal } = this.drag;
+
+      if (vertical) {
+        this.drag.vertical = false;
+      } else if (horizontal) {
+        this.drag.horizontal = false;
+      }
+
+      this.removeDragEventListener();
     },
-    dragging(direction, e) {
-      if (this.drag[direction]) {
-        console.log(e);
-        this.scroll[direction] = e.clientY;
+    dragging(e) {
+      /* eslint-disable */
+      const { vertical, horizontal } = this.drag;
+
+      this.dd = (e.pageY - this.d);
+
+      if (vertical) {
+        this.chanegeScroll('vertical', this.dd);
+      } else if (horizontal) {
+        this.chanegeScroll('horizontal', e.pageX);
       }
     },
     chanegeScroll(direction, newScroll) {
@@ -161,14 +194,12 @@ export default {
       const minScroll = 0;
       const maxScroll = direction === 'horizontal' ? maxScrollWidth : maxScrollHeight;
 
-      const currentScroll = this.scroll[direction];
-
-      if (currentScroll + newScroll <= minScroll) {
+      if (newScroll <= minScroll) {
         this.scroll[direction] = minScroll;
-      } else if (currentScroll + newScroll >= maxScroll) {
+      } else if (newScroll >= maxScroll) {
         this.scroll[direction] = maxScroll;
       } else {
-        this.scroll[direction] += newScroll;
+        this.scroll[direction] = newScroll;
       }
     },
     handleScroll(e) {
@@ -176,7 +207,7 @@ export default {
       const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * wheelSpeed;
 
       if (vertical && horizontal) {
-        this.chanegeScroll('vertical', delta);
+        this.chanegeScroll('vertical', delta + this.scroll.vertical);
       } else if (vertical && !horizontal) {
         this.chanegeScroll('vertical', delta);
       } else {
