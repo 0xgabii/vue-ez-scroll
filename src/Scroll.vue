@@ -1,7 +1,8 @@
 <template>
   <div 
     class="vScroll" 
-    :id="scrollId">
+    :id="scrollId"
+    @wheel="handleScroll">
 
     {{d}} X {{dd}} X {{scrollEnv.clientHeight}}
 
@@ -203,6 +204,11 @@ export default {
       }
     },
     handleScroll(e) {
+      // prevent browser scrollbar move
+      e.preventDefault();
+
+      console.log(e);
+
       const { vertical, horizontal, wheelSpeed } = this.scrollOption;
       const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * wheelSpeed;
 
@@ -242,11 +248,6 @@ export default {
     this.id = this._uid;
 
     this.$nextTick(() => {
-      const component = document.getElementById(this.scrollId);
-
-      component.addEventListener('mousewheel', this.handleScroll);
-      component.addEventListener('DOMMouseScroll', this.handleScroll);
-
       this.getComponentDOMInfo();
     });
   },
