@@ -2,6 +2,13 @@
   position: relative;
   overflow: hidden;
 
+  &.dragging {
+
+    .vScroll__content {
+      user-select: none;
+    }
+  }
+
   &__content {
     transition: all 0.2s;
   }
@@ -30,8 +37,6 @@
     position: absolute;
 
     background-color: black; 
-
-    transition: all 0.2s;
 
     &--vertical {
       top: 0;
