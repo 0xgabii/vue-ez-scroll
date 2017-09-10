@@ -1,23 +1,23 @@
 <template>
   <div 
-    class="vScroll" 
+    class="vScroll"
     :id="scrollId"
+    :class="isDragging"
     @wheel="handleScroll">
-
-    {{drag.ing}} X {{scrollEnv.clientHeight}} X {{scrollEnv.maxScrollHeight}}
 
     <div class="vScroll__content" :style="contentStyle">
       <slot />
     </div>
 
-    <div class="vScroll__rail vScroll__rail--horizontal">
+    <div class="vScroll__rail vScroll__rail--horizontal" @mousedown="jumpScroll('horizontal', $event)">
       <div 
         class="vScroll__bar vScroll__bar--horizontal"
         :style="scrollStyle.horizontal"
+        @mousedown="dragStart('horizontal', $event)"
       />
     </div>
    
-    <div class="vScroll__rail vScroll__rail--vertical">
+    <div class="vScroll__rail vScroll__rail--vertical" @mousedown="jumpScroll('vertical', $event)">
       <div 
         class="vScroll__bar vScroll__bar--vertical"
         :style="scrollStyle.vertical"
@@ -146,8 +146,33 @@ export default {
         },
       };
     },
+
+    isDragging() {
+      const { vertical, horizontal } = this.drag;
+      return (vertical || horizontal) && 'dragging';
+    },
   },
   methods: {
+    jumpScroll(direction, e) {
+      // active only rail
+      if (e.target.className.includes('bar')) return;
+
+      const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
+      const { left, top } = e.target.getBoundingClientRect();
+
+      const gap = {
+        vertical: e.pageY - top,
+        horizontal: e.pageX - left,
+      };
+
+      const jump = {
+        vertical: (gap.vertical / clientHeight) * scrollHeight,
+        horizontal: (gap.horizontal / clientWidth) * scrollWidth,
+      };
+
+      this.chanegeScroll(direction, jump[direction] - this.scroll[direction]);
+    },
+
     addDragEventListener() {
       document.addEventListener('mouseup', this.dragEnd);
       document.addEventListener('mousemove', this.dragging);
@@ -160,7 +185,10 @@ export default {
     dragStart(direction, e) {
       this.drag[direction] = true;
 
-      this.drag.ing = direction === 'vertical' ? e.pageY : e.pageX;
+      this.drag.ing = {
+        vertical: e.pageY,
+        horizontal: e.pageX,
+      };
 
       this.addDragEventListener();
     },
@@ -176,18 +204,20 @@ export default {
       this.removeDragEventListener();
     },
     dragging(e) {
-      /* eslint-disable */
       const { pageX, pageY } = e;
       const { vertical, horizontal, ing } = this.drag;
       const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
 
       if (vertical) {
-        this.chanegeScroll('vertical', ((pageY - ing) / clientHeight) * scrollHeight);
-        this.drag.ing = e.pageY;
+        this.chanegeScroll('vertical', ((pageY - ing.vertical) / clientHeight) * scrollHeight);
       } else if (horizontal) {
-        this.chanegeScroll('horizontal', ((pageX - ing) / clientWidth) * scrollWidth);
-        this.drag.ing = e.pageX;
+        this.chanegeScroll('horizontal', ((pageX - ing.horizontal) / clientWidth) * scrollWidth);
       }
+
+      this.drag.ing = {
+        vertical: pageY,
+        horizontal: pageX,
+      };
     },
     chanegeScroll(direction, newScroll) {
       const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
