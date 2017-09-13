@@ -7,6 +7,10 @@
     .vScroll__content {
       user-select: none;
     }
+
+    .vScroll__bar {
+      transition: none;
+    }
   }
 
   &__content {
@@ -36,7 +40,12 @@
   &__bar {
     position: absolute;
 
-    background-color: black; 
+    background-color: black;
+    border-radius: 5rem;
+
+    cursor: pointer;
+
+    transition: all 0.2s;
 
     &--vertical {
       top: 0;
