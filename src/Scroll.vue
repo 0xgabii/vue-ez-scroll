@@ -277,7 +277,13 @@ export default {
 
     this.$nextTick(() => {
       this.getComponentDOMInfo();
+
+      window.addEventListener('resize', this.getComponentDOMInfo);
+      document.getElementById(this.scrollId).addEventListener('DOMNodeInserted', this.getComponentDOMInfo);
     });
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.getComponentDOMInfo);
   },
 };
 </script>
