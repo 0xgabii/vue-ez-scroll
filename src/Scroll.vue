@@ -279,7 +279,7 @@ export default {
       this.getComponentDOMInfo();
 
       window.addEventListener('resize', this.getComponentDOMInfo);
-      document.getElementById(this.scrollId).addEventListener('DOMNodeInserted', this.getComponentDOMInfo);
+      document.getElementById(this.scrollId).addEventListener('DOMSubtreeModified', this.getComponentDOMInfo);
     });
   },
   destroyed() {
