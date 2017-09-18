@@ -33,8 +33,6 @@ const defaultOption = {
   // scroll direction
   horizontal: true,
   vertical: true,
-  // size of the scrollbar = undefined ? variable : fixed
-  barSize: undefined,
   // higher value => faster scrolling
   wheelSpeed: 150,
 };
@@ -112,11 +110,11 @@ export default {
       } = this.scrollEnv;
       /*
         Exact size of the scrollbar
-        default barsize undefined => visible part * (visible part / scroll part)
+        visible part * (visible part / scroll part)
       */
       const barSize = {
-        h: this.scrollOption.barSize || clientWidth * (clientWidth / scrollWidth),
-        v: this.scrollOption.barSize || clientHeight * (clientHeight / scrollHeight),
+        h: clientWidth * (clientWidth / scrollWidth),
+        v: clientHeight * (clientHeight / scrollHeight),
       };
       /*
         Exact position of the scrollbar
@@ -133,16 +131,24 @@ export default {
         v: maxScrollHeight === 0 ? 0 : 1,
       };
 
+      // Active only if there is space available for scrolling
+      const barDisable = {
+        h: maxScrollWidth === 0 ? 'none' : 'auto',
+        v: maxScrollHeight === 0 ? 'none' : 'auto',
+      };
+
       return {
         horizontal: {
           width: `${barSize.h}px`,
           left: `${barPosition.h}px`,
           opacity: barDisplay.h,
+          pointerEvents: barDisable.h,
         },
         vertical: {
           height: `${barSize.v}px`,
           top: `${barPosition.v}px`,
           opacity: barDisplay.v,
+          pointerEvents: barDisable.v,
         },
       };
     },
@@ -155,40 +161,33 @@ export default {
   methods: {
     jumpScroll(direction, e) {
       // active only rail
-      if (e.target.className.includes('bar')) return;
+      if (!e.target.className.includes('rail')) return;
 
-      const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
-      const { left, top } = e.target.getBoundingClientRect();
-
-      const gap = {
-        vertical: e.pageY - top,
-        horizontal: e.pageX - left,
-      };
+      const { left, top, width, height } = e.target.getBoundingClientRect();
 
       const jump = {
-        vertical: (gap.vertical / clientHeight) * scrollHeight,
-        horizontal: (gap.horizontal / clientWidth) * scrollWidth,
+        vertical: (e.pageY - top) - (height / 2),
+        horizontal: (e.pageX - left) - (width / 2),
       };
 
-      this.chanegeScroll(direction, jump[direction] - this.scroll[direction]);
+      this.chanegeScroll(direction, jump[direction]);
     },
 
     addDragEventListener() {
       document.addEventListener('mouseup', this.dragEnd);
       document.addEventListener('mousemove', this.dragging);
+      document.body.style.userSelect = 'none';
     },
     removeDragEventListener() {
       document.removeEventListener('mouseup', this.dragEnd);
       document.removeEventListener('mousemove', this.dragging);
+      document.body.style.userSelect = 'auto';
     },
 
     dragStart(direction, e) {
       this.drag[direction] = true;
 
-      this.drag.ing = {
-        vertical: e.pageY,
-        horizontal: e.pageX,
-      };
+      this.drag.ing = direction === 'vertical' ? e.pageY : e.pageX;
 
       this.addDragEventListener();
     },
@@ -206,18 +205,14 @@ export default {
     dragging(e) {
       const { pageX, pageY } = e;
       const { vertical, horizontal, ing } = this.drag;
-      const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
 
       if (vertical) {
-        this.chanegeScroll('vertical', ((pageY - ing.vertical) / clientHeight) * scrollHeight);
+        this.chanegeScroll('vertical', pageY - ing);
+        this.drag.ing = pageY;
       } else if (horizontal) {
-        this.chanegeScroll('horizontal', ((pageX - ing.horizontal) / clientWidth) * scrollWidth);
+        this.chanegeScroll('horizontal', pageX - ing);
+        this.drag.ing = pageX;
       }
-
-      this.drag.ing = {
-        vertical: pageY,
-        horizontal: pageX,
-      };
     },
     chanegeScroll(direction, newScroll) {
       const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
