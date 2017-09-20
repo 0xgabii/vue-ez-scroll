@@ -164,13 +164,19 @@ export default {
       if (!e.target.className.includes('rail')) return;
 
       const { left, top, width, height } = e.target.getBoundingClientRect();
+      const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
 
       const jump = {
-        vertical: (e.pageY - top) - (height / 2),
-        horizontal: (e.pageX - left) - (width / 2),
+        vertical: e.pageY - top - (height / 2),
+        horizontal: e.pageX - left - (width / 2),
       };
 
-      this.chanegeScroll(direction, jump[direction]);
+      const move = {
+        vertical: (jump.vertical / clientHeight) * scrollHeight,
+        horizontal: (jump.horizontal / clientWidth) * scrollWidth,
+      };
+
+      this.chanegeScroll(direction, move[direction] - this.scroll[direction]);
     },
 
     addDragEventListener() {
@@ -205,12 +211,13 @@ export default {
     dragging(e) {
       const { pageX, pageY } = e;
       const { vertical, horizontal, ing } = this.drag;
+      const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
 
       if (vertical) {
-        this.chanegeScroll('vertical', pageY - ing);
+        this.chanegeScroll('vertical', ((pageY - ing) / clientHeight) * scrollHeight);
         this.drag.ing = pageY;
       } else if (horizontal) {
-        this.chanegeScroll('horizontal', pageX - ing);
+        this.chanegeScroll('horizontal', ((pageX - ing) / clientWidth) * scrollWidth);
         this.drag.ing = pageX;
       }
     },
