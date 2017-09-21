@@ -163,12 +163,12 @@ export default {
       // active only rail
       if (!e.target.className.includes('rail')) return;
 
-      const { left, top, width, height } = e.target.getBoundingClientRect();
+      const { left, top } = e.target.getBoundingClientRect();
       const { clientWidth, clientHeight, scrollWidth, scrollHeight } = this.scrollEnv;
 
       const jump = {
-        vertical: e.pageY - top - (height / 2),
-        horizontal: e.pageX - left - (width / 2),
+        vertical: e.clientY - top,
+        horizontal: e.clientX - left,
       };
 
       const move = {
