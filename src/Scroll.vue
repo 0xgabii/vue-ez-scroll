@@ -2,14 +2,17 @@
   <div 
     class="vScroll"
     :id="scrollId"
-    :class="isDragging"
+    :class="scrollClass"
     @wheel="handleScroll">
 
     <div class="vScroll__content" :style="contentStyle">
       <slot />
     </div>
 
-    <div class="vScroll__rail vScroll__rail--horizontal" @mousedown="jumpScroll('horizontal', $event)">
+    <div 
+      class="vScroll__rail vScroll__rail--horizontal" 
+      :style="railStyle.horizontal"
+      @mousedown="jumpScroll('horizontal', $event)">
       <div 
         class="vScroll__bar vScroll__bar--horizontal"
         :style="scrollStyle.horizontal"
@@ -17,7 +20,10 @@
       />
     </div>
    
-    <div class="vScroll__rail vScroll__rail--vertical" @mousedown="jumpScroll('vertical', $event)">
+    <div 
+      class="vScroll__rail vScroll__rail--vertical" 
+      :style="railStyle.vertical"
+      @mousedown="jumpScroll('vertical', $event)">
       <div 
         class="vScroll__bar vScroll__bar--vertical"
         :style="scrollStyle.vertical"
@@ -35,6 +41,8 @@ const defaultOption = {
   vertical: true,
   // higher value => faster scrolling
   wheelSpeed: 150,
+  // rail margin
+  railMargin: 0,
 };
 
 export default {
@@ -72,6 +80,13 @@ export default {
     scrollId() {
       return `scroll-${this.id}`;
     },
+    scrollClass() {
+      const { vertical, horizontal } = this.drag;
+
+      return {
+        dragging: vertical || horizontal,
+      };
+    },
     scrollOption() {
       return {
         ...this.option,
@@ -105,9 +120,8 @@ export default {
         clientHeight,
         scrollWidth,
         scrollHeight,
-        maxScrollWidth,
-        maxScrollHeight,
       } = this.scrollEnv;
+      const margin = this.scrollOption.railMargin * 2;
       /*
         Exact size of the scrollbar
         visible part * (visible part / scroll part)
@@ -118,44 +132,54 @@ export default {
       };
       /*
         Exact position of the scrollbar
-        (visible part - scrollbar size) * (scrolling percentage / 100)
+        (visible part - scrollbar size - railMargin) * (scrolling percentage / 100)
       */
       const barPosition = {
-        h: (clientWidth - barSize.h) * (hScrollPercent / 100),
-        v: (clientHeight - barSize.v) * (vScrollPercent / 100),
-      };
-
-      // Shows only if there is space available for scrolling
-      const barDisplay = {
-        h: maxScrollWidth === 0 ? 0 : 1,
-        v: maxScrollHeight === 0 ? 0 : 1,
-      };
-
-      // Active only if there is space available for scrolling
-      const barDisable = {
-        h: maxScrollWidth === 0 ? 'none' : 'auto',
-        v: maxScrollHeight === 0 ? 'none' : 'auto',
+        h: (clientWidth - barSize.h - margin) * (hScrollPercent / 100),
+        v: (clientHeight - barSize.v - margin) * (vScrollPercent / 100),
       };
 
       return {
         horizontal: {
           width: `${barSize.h}px`,
           left: `${barPosition.h}px`,
-          opacity: barDisplay.h,
-          pointerEvents: barDisable.h,
         },
         vertical: {
           height: `${barSize.v}px`,
           top: `${barPosition.v}px`,
-          opacity: barDisplay.v,
-          pointerEvents: barDisable.v,
         },
       };
     },
+    railStyle() {
+      const { railMargin } = this.scrollOption;
+      const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
 
-    isDragging() {
-      const { vertical, horizontal } = this.drag;
-      return (vertical || horizontal) && 'dragging';
+      // Shows only if there is space available for scrolling
+      const railDisplay = {
+        h: maxScrollWidth <= 0 ? 0 : 1,
+        v: maxScrollHeight <= 0 ? 0 : 1,
+      };
+
+      // Active only if there is space available for scrolling
+      const railDisable = {
+        h: maxScrollWidth <= 0 ? 'none' : 'auto',
+        v: maxScrollHeight <= 0 ? 'none' : 'auto',
+      };
+
+      return {
+        horizontal: {
+          left: `${railMargin}px`,
+          right: `${railMargin}px`,
+          opacity: railDisplay.h,
+          pointerEvents: railDisable.h,
+        },
+        vertical: {
+          top: `${railMargin}px`,
+          bottom: `${railMargin}px`,
+          opacity: railDisplay.v,
+          pointerEvents: railDisable.v,
+        },
+      };
     },
   },
   methods: {
@@ -289,3 +313,5 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" src="../styles/scroll.scss" />
