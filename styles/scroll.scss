@@ -14,7 +14,7 @@
   }
 
   &__content {
-    transition: all 0.2s;
+    transition: all 0.3s ease;
   }
 
   &__rail {
@@ -24,7 +24,7 @@
       top: 0;
       right: 0;
       bottom: 0;
-      
+
       width: 10px;
     }
 
@@ -36,29 +36,26 @@
       height: 10px;
     }
   }
-
+  
   &__bar {
     position: absolute;
-
-    background-color: black;
-    border-radius: 5rem;
-
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 15px;
     cursor: pointer;
-
-    transition: all 0.2s;
+    transition: all 0.3s ease;
 
     &--vertical {
+      left: 0;
       top: 0;
-      right: 0;
       
-      width: 10px;
+      width: 100%;
     }
 
     &--horizontal {
       left: 0;
       bottom: 0;
 
-      height: 10px;
+      height: 100%;
     }
   }
 }
