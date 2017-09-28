@@ -3,7 +3,7 @@
     class="vScroll"
     :id="scrollId"
     :class="scrollClass"
-    @wheel="handleScroll">
+    @wheel.prevent="handleWheel">
 
     <div class="vScroll__content" :style="contentStyle">
       <slot />
@@ -183,6 +183,21 @@ export default {
     },
   },
   methods: {
+    chanegeScroll(direction, newScroll) {
+      const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
+
+      const minScroll = 0;
+      const maxScroll = direction === 'horizontal' ? maxScrollWidth : maxScrollHeight;
+
+      if (this.scroll[direction] + newScroll <= minScroll) {
+        this.scroll[direction] = minScroll;
+      } else if (this.scroll[direction] + newScroll >= maxScroll) {
+        this.scroll[direction] = maxScroll;
+      } else {
+        this.scroll[direction] += newScroll;
+      }
+    },
+
     jumpScroll(direction, e) {
       // active only rail
       if (!e.target.className.includes('rail')) return;
@@ -203,6 +218,19 @@ export default {
       this.chanegeScroll(direction, move[direction] - this.scroll[direction]);
     },
 
+    handleWheel(e) {
+      const { vertical, horizontal, wheelSpeed } = this.scrollOption;
+      const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * wheelSpeed;
+
+      if (vertical && horizontal) {
+        this.chanegeScroll('vertical', delta);
+      } else if (vertical && !horizontal) {
+        this.chanegeScroll('vertical', delta);
+      } else {
+        this.chanegeScroll('horizontal', delta);
+      }
+    },
+
     addDragEventListener() {
       document.addEventListener('mouseup', this.dragEnd);
       document.addEventListener('mousemove', this.dragging);
@@ -213,7 +241,6 @@ export default {
       document.removeEventListener('mousemove', this.dragging);
       document.body.style.userSelect = 'auto';
     },
-
     dragStart(direction, e) {
       this.drag[direction] = true;
 
@@ -245,35 +272,7 @@ export default {
         this.drag.ing = pageX;
       }
     },
-    chanegeScroll(direction, newScroll) {
-      const { maxScrollWidth, maxScrollHeight } = this.scrollEnv;
 
-      const minScroll = 0;
-      const maxScroll = direction === 'horizontal' ? maxScrollWidth : maxScrollHeight;
-
-      if (this.scroll[direction] + newScroll <= minScroll) {
-        this.scroll[direction] = minScroll;
-      } else if (this.scroll[direction] + newScroll >= maxScroll) {
-        this.scroll[direction] = maxScroll;
-      } else {
-        this.scroll[direction] += newScroll;
-      }
-    },
-    handleScroll(e) {
-      // prevent browser scrollbar move
-      e.preventDefault();
-
-      const { vertical, horizontal, wheelSpeed } = this.scrollOption;
-      const delta = -Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * wheelSpeed;
-
-      if (vertical && horizontal) {
-        this.chanegeScroll('vertical', delta);
-      } else if (vertical && !horizontal) {
-        this.chanegeScroll('vertical', delta);
-      } else {
-        this.chanegeScroll('horizontal', delta);
-      }
-    },
     getComponentDOMInfo() {
       const {
         scrollWidth,
