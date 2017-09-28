@@ -1,0 +1,52 @@
+
+.vScroll {
+  position: relative;
+  overflow: hidden;
+}
+.vScroll.dragging .vScroll__content {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+}
+.vScroll.dragging .vScroll__bar {
+    -webkit-transition: none;
+    transition: none;
+}
+.vScroll__content {
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.vScroll__rail {
+    position: absolute;
+}
+.vScroll__rail--vertical {
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 10px;
+}
+.vScroll__rail--horizontal {
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 10px;
+}
+.vScroll__bar {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-radius: 15px;
+    cursor: pointer;
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.vScroll__bar--vertical {
+      left: 0;
+      top: 0;
+      width: 100%;
+}
+.vScroll__bar--horizontal {
+      left: 0;
+      bottom: 0;
+      height: 100%;
+}
