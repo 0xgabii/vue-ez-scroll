@@ -1,6 +1,6 @@
 {
   "name": "vue-ez-scroll",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Customizable scrolling wrapper component for Vue",
   "main": "./dist/main.js",
   "author": "https://github.com/gomonk3037",
